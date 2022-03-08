@@ -56,6 +56,8 @@
 
 - fs.writeFile(file, data[, options], callback), 写入内容
 
+  只能用来创建文件，不能创建路径。
+
   ~~~ js
   const fs = require('fs');
   
@@ -78,7 +80,70 @@
 
 ### 1.3 path路径模块
 
+> 用来处理路径的模块。
 
+- path.join()
+- path.basename(), 从路径字符串中，将文件名解析出来。
+- path.extname(), 获取路径中的扩展名部分。
 
 ### 1.4 http模块
+
+> 在网络节点中，负责消费资源的电脑，叫客户端。
+>
+> 负责对外提供网络资源的电脑，叫服务器。
+
+> http 模块是Node.js 官方提供的、用来创建 web 服务器的模块。
+
+- http.createServer()
+
+- ==DNS==
+
+- 创建web服务器的基本步骤？
+
+  - 导入http模块。
+  - 创建 web 服务器实例。
+  - 为服务器实例绑定 request 事件，监听客户端请求。
+  - 启动服务器。
+
+  ~~~ js
+  const http = require('http')
+  const server = http.createServer()
+  
+  server.on('request', (req, res)=>{
+      const url = req.url;
+      const method = req.method;
+      const str = `your request url is ${url}, method: ${method}`
+      res.end(str)
+  })
+  
+  server.listen(8080, function(){
+      console.log('server running at http://127.0.0.1:8080');
+  })
+  ~~~
+
+  
+
+- 解决中文乱码问题。
+
+  ~~~ js
+  server.on('request', (req, res)=>{
+      const url = req.url;
+      const method = req.method;
+      const str = `乱码：your request url is ${url}, method: ${method}`
+  
+      res.setHeader('Content-Type', 'text/html; charset=utf-8')
+      res.end(str);
+  })
+  ~~~
+
+- 根据不同的url 相应不同的 html内容。
+
+  1. 获取 请求的 url 地址。
+  2. 设置 默认的响应内容
+  3. 判断用户请求的是否为 index.html 
+  4. 判断是否为 about.html
+  5. 防止乱码
+  6. 把内容响应给客户端。
+
+- 优化资源请求路径。
 
