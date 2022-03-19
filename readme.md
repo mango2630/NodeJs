@@ -189,6 +189,105 @@
 ### 2.1 包
 
 - 格式化时间： `moment`包
+- 安装 `npm install xxxx`
+- 语义化版本规范：大版本.功能版本.bug修复版本
 
+---
 
+### 2.2 包管理配置文件
+
+- `package.json`
+  - 创建该文件：`npm init -y`
+
+- 卸载包：`npm uninstall xxx`
+
+- devDependencies ： `npm i xxx -D` [只在开发阶段用]
+
+- 下包速度慢：
+
+  - why: 海底光缆
+  - 解决：淘宝镜像服务器
+
+  ~~~ shell
+  # 查看当前的下包镜像源
+  npm config get registry
+  # 将下包的镜像源切为淘宝镜像源
+  npm config set registry=https://registry.npm.taobao.org/
+  # 检查镜像源是否下载成功
+  npm config get registry
+  ~~~
+
+- `nrm` 快速查看和切换下包的镜像源
+
+  ~~~ shell
+  npm i nrm -g
+  # 查看所有可用的镜像源
+  nrm ls
+  # 将所有的镜像源切换为 taobao
+  nrm use taobao
+  ~~~
+
+- 包的分类：
+
+  - 全局包
+  - 项目包
+    - 核心依赖包
+    - 开发依赖包
+
+- 好包
+
+  - `i5ting_toc` ： md 转化为 html 文件
+
+    ~~~ shell
+    i5ting_toc -f xxx -o
+    ~~~
+
+---
+
+### 2.3 开发属于自己的包
+
+1. 需要实现功能：
+   - 格式化日期
+   - 转义 HTML 中的特殊字符
+   - 还原 HTML 中的特殊字符
+   
+2. ……..
+
+3. 发布包
+
+   ~~~ shell
+   npm login
+   npm publish
+   # 删除已经发布的包
+   npm unpublish packageName --force
+   ~~~
+
+---
+
+### 2.4 模块的加载机制
+
+1. **模块在第一次加载后会被缓存。**
+2. 意味着多次调用`require()`不会导致模块的代码被执行多次。
+3. 模块优先从缓存中加载。
+4. 内置模块优先级最高。
+
+#### 自定义模块加载机制：
+
+test -> test.js -> test.json -> test.node
+
+#### 第三方模块加载机制：
+
+- 从当前模块的父目录开始，尝试从`node_modules`文件夹中加载第三方模块。
+
+- 如果没有找到对应的第三方模块，则移动到再上一层父目录中，进行加载，直到文件系统的根目录。
+
+#### require()引用目录：
+
+- 在被加载的目录下查找 `package.json`文件，并寻找main属性，作为require()加载的入口。
+- 如果没有 `package.json` 或者main无法解析，则将index.js进行加载。
+- 如果以上两步都失败，error。
+
+---
+
+## 3. express
 
