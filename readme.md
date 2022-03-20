@@ -291,3 +291,209 @@ test -> test.js -> test.json -> test.node
 
 ## 3. express
 
+- nodemon 工具包：监听项目的自动重启 
+
+- 路由
+
+- 模块化路由
+
+  1. 创建路由模块对应的 js 文件
+  2. 调用 express.Router() 函数创建路由对象
+  3. 向路由对象上挂在具体的路由
+  4. 使用 `module.express` 向外共享路由对象
+  5. 使用 `app.use()` 函数注册路由模块
+
+- express 中间件。
+
+  - 对请求进行预处理。
+  - next()函数。 
+  - 全局生效的中间件。
+
+  ---
+
+  - **路由之前注册中间件！**
+  - 客户端发送过来的请求，可以连续调用多个中间件函数。
+  - 不要忘记调用 `next()` 函数。
+  - 为了防止代码逻辑混论，调用`next()`函数后，不要再写额外代码。
+
+- 中间件分类：
+
+  - 应用级别：绑定到app实力上。
+  - 路由级别：绑定到`express.Router()` 上。
+  - 第三方级别：
+  - 内置级别：`express.static()` | `express.json()`  | `express.urlencoded()`
+  - 错误级别中间件： `(err, req, res, next)` ; **注册在路由之后。**
+
+- 自定义中间件：
+
+  1. 定义中间件
+  2. 监听req 的 data 事件
+  3. 监听 req 的 end 事件
+  4. 使用 querystring 模块解析请求体数据
+  5. 将解析出来的数据对象挂载为 req.body 
+
+- CORS跨域资源共享
+
+  - 跨域：协议不同
+  - 解决：cors | jsonp（只支持get请求）
+
+  ~~~ shell
+  npm install cors
+  ~~~
+
+  ~~~ shell
+  # 允许访问该资源的外域URL
+  Access-Control-Allow-Origin
+  # 对额外请求头进行声明
+  Access-Control-Allow-Headers
+  # 声明请求所允许使用的HTTP方法
+  Access-Control-Allow-Methods
+  ~~~
+
+- 简单请求 | 预检请求
+
+~~~ js
+const express = require('express')
+const app = express()
+
+// 定义一个简单的中间件函数
+const mv = function(req, res, next){
+    const time = Date.now();
+    req.startTime = time;
+    next();
+}
+
+// 注册为全局生效的中间件
+app.use(mv) 
+
+app.get('/', function (req, res) {  
+    res.send('home page' + req.startTime)
+    // res.send('home page')
+})
+app.post('/user', function (req, res) {  
+    res.send('user page' + req.startTime)
+})
+
+app.listen(8080, ()=>{
+    console.log('start succdeed');
+})
+~~~
+
+---
+
+## 4. 数据库
+
+> 数据库是用来组织、存储和管理数据的仓库。
+
+- 关系型数据库 & 非关系型数据库。
+
+~~~ shell
+# 项目中安装 Mysql 模块
+npm install mysql
+~~~
+
+- 建立连接
+
+  ~~~ js
+  const mysql = require('mysql')
+  
+  // 建立于mysql 数据库的连接
+  const db = mysql.createPool({
+      host: '127.0.0.1',
+      user: 'root',
+      password: 'root',
+      database: 'heima_nodejs'
+  })
+  
+  // 测试 mysql 模块能否正常工作
+  db.query('SELECT 1', (err, res) => {
+      if(err) return console.log(err.message);
+      console.log(res);
+  })
+  ~~~
+
+- 查询
+
+  ~~~ js
+  // 查询users表中所有数据
+  const sqlStr = 'select * from users'
+  db.query(sqlStr, (err, res)=>{
+      if(err) return console.log(err.message);
+      console.log(res);
+  })
+  ~~~
+
+- 插入
+
+  ~~~ js
+  // 插入数据
+  const user = {
+      username: 'denny',
+      password: 'pccse'
+  }
+  const sqlStr1 = 'INSERT INTO users (username, password) VALUES (?, ?)'
+  db.query(sqlStr1, [user.username, user.password], (err, res)=>{
+      if(err) return console.log(err.message);
+      if(res.affectedRows === 1){
+          console.log('插入数据成功');
+      }
+  })
+  
+  // 插入数据的便捷方式
+  const user1 = {
+      username: 'denny',
+      password: '9999'
+  }
+  const sqlStr2 = 'INSERT INTO users SET ?'
+  db.query(sqlStr2, user1, (err, res)=>{
+      if(err) return console.log(err.message);
+      if(res.affectedRows === 1){
+          console.log('插入数据成功');
+      }
+  })
+  ~~~
+
+- 更新数据
+
+  ~~~ js
+  // 更新数据
+  const user2 = {
+      username: 'jenny',
+      password: '9999'
+  }
+  const sqlStr3 = 'UPDATE users SET username=? where password=?'
+  db.query(sqlStr3, [user2.username, user2.password], (err, res)=>{
+      if(err) return console.log(err.message);
+      if(res.affectedRows === 2){
+          console.log('更新数据成功');
+      }
+  })
+  
+  // way2
+  db.query(sqlStr3, [user2, user2.password], (err, res)=>{})
+  ~~~
+
+- 删除数据
+
+  ~~~ js
+  const sqlStr4 = 'DELETE FROM users where password=?'
+  db.query(sqlStr4, '9999', (err, res)=>{
+      if(err) return console.log(err.message);
+      console.log(res);
+      if(res.affectedRows === 2){
+          console.log('删除数据成功');
+      }
+  })
+  ~~~
+
+- 标记删除
+
+---
+
+## 5. 前后端身份认证
+
+- 服务端渲染：session认证机制
+- 前后端分离：JWT 认证机制
+
+#### 5.1 Session认证机制
+

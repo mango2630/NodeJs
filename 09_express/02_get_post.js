@@ -18,6 +18,19 @@ app.get('/user', (req, res)=>{
     })
 })
 
+// 监听post请求
 app.post('/user', (req, res)=>{
     res.send('请求成功')
+})
+
+// 获取query参数
+app.get('/', (req, res)=>{
+    console.log(req.query);
+    res.send(req.query)
+})
+
+// 获取url中的动态参数 params
+app.get('/users/:id/:name', (req, res)=>{
+    console.log(req.params);
+    res.send(req.params)
 })
