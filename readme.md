@@ -322,7 +322,7 @@ test -> test.js -> test.json -> test.node
   - 路由级别：绑定到`express.Router()` 上。
   - 第三方级别：
   - 内置级别：`express.static()` | `express.json()`  | `express.urlencoded()`
-  - 错误级别中间件： `(err, req, res, next)` ; **注册在路由之后。**
+  - **错误级别中间件**： `(err, req, res, next)` ; **注册在路由之后。**
 
 - 自定义中间件：
 
@@ -497,3 +497,111 @@ npm install mysql
 
 #### 5.1 Session认证机制
 
+1. HTTP 协议的无状态性。
+
+   客户端的每次HTTP请求都是独立的，连续多个请求之间没有直接的关系，服务器不会主动保留每次HTTP请求的状态。
+
+2. 如何突破 HTTP 无状态的限制。
+
+   **颁发身份认证标识 —— `Cookie`。**
+
+3. 什么是 Cookie?
+
+   不同域名下的 Cookie 是各自独立的，每当客户端发起请求时，会自动把当前域名下所有未过期的Cookie一同发送到服务器。
+
+4. Cookie 的特性：
+
+   - 自动发送。
+   - 域名独立。
+   - 过期时限。
+   - 4KB 限制。
+
+5. Cookie 在身份认证中的作用：
+
+   客户端第一次请求服务器时，服务器通过响应头的形式，向客户端发送一个身份认证的Cookie，客户端会自动将 Cookie保存在浏览器中。
+
+   随后，当客户端浏览器每次请求服务器时，浏览器会自动将身份认证相关的 Cookie，通过请求头的形式发送给服务器，服务器即可验明客户端的身份。
+
+   ![](img/2_cookie.png)
+
+6. **Cookie 不具有安全性**。
+
+7. 提高身份认证的安全性。
+
+   **会员卡 + 刷卡认证 —— Session 认证机制的精髓**
+
+---
+
+8. Session 的工作原理。
+
+   ![](img/3_session%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86.png)
+
+---
+
+#### 5.2 express 中使用 Session
+
+~~~ js
+const express = require('express')
+const app = express();
+
+// 1. 导入session中间件
+var session = require('express-session')
+
+// 2. 配置Session中间件
+app.use(session({
+    secret: 'keyword cat',
+    resave: false,
+    saveUninitialized: true
+}))
+~~~
+
+---
+
+#### 5.3 JWT 认证机制
+
+> JSON Web Token, 跨域解决方案。
+
+![](img/4_jwt.png)
+
+---
+
+1. 组成部分：Header.**PayLoad**.Signature.
+
+2. 使用方式：
+
+   ~~~ shell 
+   Authorization: Bearer <token>
+   ~~~
+
+3. 安装
+
+   ~~~ shell
+   npm install jsonwebtoken express-jwt
+   ~~~
+
+
+
+
+## 实战
+
+1. 对密码加密
+
+   ~~~shell
+   npm in bcryptjs
+   ~~~
+
+2. 优化表单数据验证。
+
+   - @hapi/jpi
+   - @escook/express-joi
+
+3. 生成JWT的token字符串
+
+   剔除密码和头像。
+
+   ~~~ shell
+   jsonwebtoken
+   express-jwt
+   ~~~
+
+   
